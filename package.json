@@ -1,7 +1,7 @@
 {
   "name": "multimind-sdk",
   "version": "0.1.1",
-  "description": "A comprehensive JavaScript/TypeScript SDK that provides full feature parity with the Python MultiMind SDK",
+  "description": "This SDK gives JavaScript/TypeScript developers full access to advanced AI features like agent orchestration, RAG, and fine-tuning — without needing to manage backend code.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
