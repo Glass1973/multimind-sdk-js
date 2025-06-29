@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline NPM Publish
 
 on:
   push:
@@ -55,13 +55,17 @@ jobs:
       - name: Run full test suite
         run: npm test
       - name: Build main SDK
-        run: npm run build
+        run: npm run build || { echo 'Build failed!'; exit 1; }
       - name: Build project
-        run: npm run build:examples
+        run: npm run build:examples || { echo 'Build examples failed!'; exit 1; }
+      - name: List dist directory contents (debug)
+        run: |
+          echo 'Contents of dist:'
+          ls -l dist/
+          echo 'Contents of dist/example:'
+          ls -l dist/example/
       - name: Verify build output
         run: |
-          ls -la dist/
-          ls -la dist/example/
           if [ ! -f dist/index.js ]; then echo "dist/index.js not found!" && exit 1; fi
           node -e "import('./dist/index.js').then(() => console.log('✅ Main SDK imports successfully'))"
       - name: Test example scripts
