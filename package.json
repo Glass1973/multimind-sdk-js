@@ -1,7 +1,7 @@
 {
-  "name": "multimind-sdk-js",
+  "name": "multimind-sdk",
   "version": "0.1.0",
-  "description": "JavaScript/TypeScript SDK bridging to Python MultiMind SDK",
+  "description": "A comprehensive JavaScript/TypeScript SDK that provides full feature parity with the Python MultiMind SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {

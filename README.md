@@ -1,59 +1,90 @@
 # MultiMind SDK for JavaScript/TypeScript
 
-A comprehensive AI development toolkit that unifies fine-tuning, RAG, and agent orchestration, providing full feature parity with the Python MultiMind SDK.
+[![npm version](https://badge.fury.io/js/multimind-sdk.svg)](https://badge.fury.io/js/multimind-sdk)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+
+A comprehensive JavaScript/TypeScript SDK that provides full feature parity with the [Python MultiMind SDK](https://github.com/multimindlab/multimind-sdk), enabling seamless integration of MultiMind's advanced AI capabilities in Node.js and browser environments.
 
 ## 🚀 Features
 
-- **🤖 Agent Orchestration**: Create and manage AI agents with advanced capabilities
-- **🎯 Advanced Fine-tuning**: LoRA, Adapters, Prefix Tuning, and Meta-learning
-- **📚 Advanced RAG**: Document processing, vector storage, and hybrid retrieval
-- **🔄 Model Conversion**: PyTorch to ONNX, TensorFlow to TFLite, and more
-- **🔒 Compliance Monitoring**: GDPR, HIPAA, and privacy compliance tools
-- **🧠 Model Client System**: LSTM, MoE, and MultiModal clients
-- **🌐 Gateway API**: RESTful API server with middleware support
-- **📋 Context Transfer**: Transfer conversations between different LLM providers
-- **📊 Model Evaluation**: Comprehensive model comparison and benchmarking
+### Core Features
+- **🤖 Agent Generation**: Generate responses using various AI models with advanced orchestration
+- **🎯 Fine-tuning**: Fine-tune models with custom configurations and advanced methods
+- **🔍 RAG (Retrieval-Augmented Generation)**: Query knowledge bases with context and hybrid retrieval
+- **🔧 Adapter Management**: Load and manage model adapters for enhanced performance
+- **📊 Model Evaluation**: Evaluate model performance on various tasks with comprehensive metrics
+- **🚀 Model Routing**: Automatically route requests to the best model based on input analysis
+
+### Advanced Features
+- **🧠 Advanced Fine-tuning**: LoRA, Adapters, Prefix Tuning, Meta-Learning, Transfer Learning
+- **📚 Advanced RAG**: Document processing, metadata management, vector storage, knowledge graphs
+- **🛠️ Advanced Agents**: Tool integration, memory management, task orchestration, workflow management
+- **🔄 Model Conversion**: PyTorch, TensorFlow, ONNX, GGUF, TFLite, Safetensors with optimization
+- **🔒 Compliance Monitoring**: Real-time monitoring, privacy protection, audit trails, GDPR/HIPAA compliance
+- **🧠 Model Client System**: LSTM, MoE (Mixture of Experts), MultiModal, Federated routing
+- **🌐 Gateway API**: RESTful API with middleware, authentication, rate limiting, CORS support
+- **📋 Context Transfer**: Transfer conversations between different LLM providers with smart extraction
+- **📦 TypeScript Support**: Full TypeScript definitions and IntelliSense support
 
 ## 📦 Installation
 
 ```bash
-npm install multimind-sdk-js
+npm install multimind-sdk
 ```
 
-## 🛠️ Quick Start
+## Prerequisites
+
+1. **Python 3.8+** installed on your system
+2. **MultiMind Python SDK** installed:
+   ```bash
+   pip install multimind-sdk
+   ```
+
+## 🚀 Quick Start
 
 ### Basic Usage
 
 ```typescript
-import { MultiMindSDK } from 'multimind-sdk-js';
+import { MultiMindSDK } from 'multimind-sdk';
+
+async function main() {
+  const sdk = new MultiMindSDK();
+  
+  try {
+    await sdk.initialize();
+    
+    // Generate a response
+    const response = await sdk.generateWithAgent(
+      "What is artificial intelligence?",
+      { model: "mistral", temperature: 0.7 }
+    );
+    
+    console.log(response);
+  } finally {
+    await sdk.close();
+  }
+}
+
+main();
+```
+
+### Advanced Usage
+
+```typescript
+import { MultiMindSDK } from 'multimind-sdk';
 
 const sdk = new MultiMindSDK();
 
-// Initialize the SDK
-await sdk.initialize();
-
-// Generate with an agent
-const response = await sdk.generateWithAgent(
-  "Explain quantum computing in simple terms",
-  { model: "gpt-3.5-turbo", temperature: 0.7, maxTokens: 200 }
-);
-
-console.log(response);
-
-// Close the SDK
-await sdk.close();
-```
-
-### Advanced Fine-tuning
-
-```typescript
+// Advanced Fine-tuning with LoRA
 const fineTuneResult = await sdk.advancedFineTune({
   baseModelName: "bert-base-uncased",
-  outputDir: "./output/finetune",
+  outputDir: "./output",
   method: "lora",
-  epochs: 3,
+  epochs: 10,
   learningRate: 0.001,
-  batchSize: 16,
+  batchSize: 32,
   loraConfig: {
     r: 16,
     alpha: 32,
@@ -61,26 +92,68 @@ const fineTuneResult = await sdk.advancedFineTune({
     targetModules: ["query", "value"]
   }
 });
-```
 
-### Advanced RAG System
-
-```typescript
-// Add documents to RAG
+// Advanced RAG with Document Management
 const documents = [
   {
-    text: "MultiMind SDK is a comprehensive AI development toolkit.",
+    text: "MultiMind SDK provides comprehensive AI capabilities.",
     metadata: { type: "introduction", source: "docs" }
   }
 ];
 
 await sdk.addDocumentsToRAG(documents);
 
-// Query the RAG system
 const ragResponse = await sdk.queryAdvancedRAG({
   query: "What is MultiMind SDK?",
-  topK: 3,
+  topK: 5,
   includeMetadata: true
+});
+
+// Model Conversion
+const conversionResult = await sdk.pytorchToONNX(
+  "./models/model.pt",
+  "./models/model.onnx",
+  {
+    quantization: { method: "int8", targetDevice: "cpu" },
+    graphOptimization: { fuseOperations: true, optimizeMemory: true }
+  }
+);
+
+// Compliance Monitoring
+const complianceResult = await sdk.checkCompliance({
+  modelId: "model_123",
+  dataCategories: ["text", "user_data"],
+  useCase: "customer_support",
+  region: "EU"
+});
+
+// Advanced Agent with Tools
+const agentResponse = await sdk.runAdvancedAgent(
+  "Calculate 15 * 23 and search for quantum computing information",
+  { context: "mathematical and scientific inquiry" }
+);
+
+// Model Client System
+const lstmClient = await sdk.createLSTMModelClient({
+  modelPath: "./models/lstm.pt",
+  modelName: "custom_lstm"
+});
+
+const moeClient = await sdk.createMoEModelClient({
+  experts: {
+    "expert1": { modelName: "gpt-3.5-turbo" },
+    "expert2": { modelName: "claude-3" }
+  },
+  router: (input: string) => input.length > 100 ? "expert2" : "expert1"
+});
+
+// Gateway API
+const gateway = await sdk.startGateway({
+  host: "0.0.0.0",
+  port: 8000,
+  enableMiddleware: true,
+  corsEnabled: true,
+  rateLimit: 100
 });
 ```
 
@@ -91,7 +164,7 @@ The MultiMind SDK includes a powerful CLI for context transfer operations:
 ### Installation
 
 ```bash
-npm install -g multimind-sdk-js
+npm install -g multimind-sdk
 ```
 
 ### Basic CLI Usage
@@ -163,45 +236,122 @@ multimind-cli --chrome-config
 
 ## 📚 Examples
 
-### Run Examples
+### Running Examples
 
 ```bash
-# Run comprehensive demo
-npm run demo
-
-# Run agent example
+# Basic agent example
 npm run example:agent
 
-# Run advanced usage example
+# Advanced usage example
 npm run example:advanced
 
-# Run CLI directly
+# Comprehensive demo
+npm run demo
+
+# CLI directly
 npm run cli -- --help
 ```
 
-### Example Scripts
+### Example Files
 
-The SDK includes several example scripts in the `example/` directory:
+- `example/run-agent.ts`: Basic agent generation example
+- `example/advanced-usage.ts`: Advanced features example
+- `example/comprehensive-demo.ts`: Complete feature demonstration
+- `example/context-transfer-cli.ts`: CLI implementation
 
-- **`comprehensive-demo.ts`**: Full feature demonstration
-- **`run-agent.ts`**: Basic agent usage
-- **`advanced-usage.ts`**: Advanced features showcase
-- **`context-transfer-cli.ts`**: CLI implementation
+## 📚 API Reference
 
-## 🔧 Development
+### MultiMindSDK Class
 
-### Prerequisites
+The main SDK class that provides a unified interface to all MultiMind functionality.
 
-- Node.js 18+ 
-- TypeScript 5+
-- Python 3.8+ (for bridge functionality)
+#### Basic Methods
+
+##### Agent Methods
+- `generateWithAgent(prompt: string, config?: AgentConfig)`: Generate responses using AI agents
+- `createAgent(config?: AgentConfig)`: Create a new agent instance
+
+##### Fine-tuning Methods
+- `fineTuneModel(config: FineTuneConfig)`: Fine-tune a model
+- `createFineTuner(config: FineTuneConfig)`: Create a fine-tuner instance
+
+##### RAG Methods
+- `queryRAG(prompt: string, config: RAGConfig)`: Query a RAG system
+- `createRAGEngine(config: RAGConfig)`: Create a RAG engine instance
+
+##### Adapter Methods
+- `loadAdapter(config: AdapterConfig)`: Load a model adapter
+- `listAdapters(model: string)`: List available adapters for a model
+- `removeAdapter(model: string, adapterPath: string)`: Remove an adapter
+
+##### Evaluation Methods
+- `evaluateModel(config: EvaluationConfig)`: Evaluate a model
+- `compareModels(models: string[], task: string, dataset?: string)`: Compare multiple models
+
+##### Model Methods
+- `loadModel(config: ModelConfig)`: Load a model
+- `routeModel(input: string, availableModels?: string[])`: Route to the best model
+- `listAvailableModels()`: List all available models
+
+#### Advanced Methods
+
+##### Advanced Fine-tuning
+- `advancedFineTune(config: AdvancedFineTuneConfig)`: Advanced fine-tuning with LoRA, Adapters, etc.
+- `createAdvancedTuner(config: AdvancedFineTuneConfig)`: Create advanced tuner
+
+##### Advanced RAG
+- `createAdvancedRAG(config?: AdvancedRAGConfig)`: Create advanced RAG client
+- `addDocumentsToRAG(documents: Document[])`: Add documents to RAG
+- `queryAdvancedRAG(config: QueryConfig)`: Query advanced RAG system
+
+##### Model Conversion
+- `createModelConverter()`: Create model converter
+- `convertModel(config: ConversionConfig)`: Convert model between formats
+- `pytorchToONNX(inputPath: string, outputPath: string, config?)`: Convert PyTorch to ONNX
+- `tensorflowToTFLite(inputPath: string, outputPath: string, config?)`: Convert TensorFlow to TFLite
+- `pytorchToGGUF(inputPath: string, outputPath: string, config?)`: Convert PyTorch to GGUF
+
+##### Compliance
+- `createComplianceMonitor(config: ComplianceConfig)`: Create compliance monitor
+- `checkCompliance(check: ComplianceCheck)`: Check compliance
+
+##### Advanced Agents
+- `createAdvancedAgent(config: AdvancedAgentConfig)`: Create advanced agent
+- `runAdvancedAgent(input: string, context?)`: Run advanced agent with tools
+
+##### Model Client System
+- `createLSTMModelClient(config: ModelClientConfig)`: Create LSTM model client
+- `createMoEModelClient(config: MoEConfig)`: Create MoE model client
+- `createMultiModalClient(config: MultiModalConfig)`: Create MultiModal client
+- `createFederatedRouter(config: FederatedConfig)`: Create federated router
+
+##### Gateway
+- `createGateway(config?: GatewayConfig)`: Create gateway
+- `startGateway(config?: GatewayConfig)`: Start gateway API
+- `stopGateway()`: Stop gateway
+
+##### Context Transfer
+- `transferContext(sourceModel: string, targetModel: string, conversationData: ConversationMessage[], options?: TransferOptions)`: Transfer context between models
+- `quickTransfer(sourceModel: string, targetModel: string, conversationData: ConversationMessage[], options?: Record<string, any>)`: Quick context transfer
+- `getSupportedModels()`: Get supported models for context transfer
+- `validateConversationFormat(data: ConversationMessage[])`: Validate conversation format
+- `batchTransfer(transfers: Array<{sourceModel: string, targetModel: string, conversationData: ConversationMessage[], options?: TransferOptions}>)`: Batch context transfer
+- `createChromeExtensionConfig()`: Create Chrome extension configuration
+
+#### Utility Methods
+- `getSDKInfo()`: Get SDK information
+- `healthCheck()`: Check SDK health
+- `initialize()`: Initialize SDK
+- `close()`: Close SDK
+
+## 🛠️ Development
 
 ### Setup
 
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd multimind-sdk-js
+cd multimind-sdk
 
 # Install dependencies
 npm install
@@ -231,40 +381,75 @@ npm run cli                # Run CLI
 npm run demo               # Run comprehensive demo
 ```
 
-## 🏗️ Architecture
+### Project Structure
 
-The SDK is built with a modular architecture:
-
-- **Core Modules**: Agent, Fine-tuning, RAG, Adapters, Evaluation, Models
-- **Advanced Modules**: Advanced Fine-tuning, Advanced RAG, Model Conversion, Compliance
-- **Bridge System**: Python bridge for seamless integration with Python SDK
-- **CLI Interface**: Command-line tools for context transfer operations
-- **TypeScript Support**: Full type definitions and IntelliSense support
-
-## 🔗 Integration
-
-### Python Bridge
-
-The SDK uses a Python bridge to leverage the full capabilities of the Python MultiMind SDK:
-
-```typescript
-import { initBridge, py } from 'multimind-sdk-js';
-
-await initBridge();
-
-// Execute Python code
-const result = await py`from multimind_sdk import MultiMindAgent`;
+```
+multimind-sdk/
+├── src/
+│   ├── bridge/
+│   │   └── multimind-bridge.ts    # Python bridge setup
+│   ├── agent.ts                   # Basic agent functionality
+│   ├── fineTune.ts               # Basic fine-tuning functionality
+│   ├── rag.ts                    # Basic RAG functionality
+│   ├── adapters.ts               # Adapter management
+│   ├── evaluation.ts             # Model evaluation
+│   ├── models.ts                 # Model loading and routing
+│   ├── advancedFineTuning.ts     # Advanced fine-tuning (LoRA, Adapters, etc.)
+│   ├── advancedRAG.ts            # Advanced RAG with document management
+│   ├── modelConversion.ts        # Model conversion and optimization
+│   ├── compliance.ts             # Compliance monitoring and validation
+│   ├── advancedAgent.ts          # Advanced agents with tools and memory
+│   ├── modelClientSystem.ts      # LSTM, MoE, MultiModal, Federated routing
+│   ├── gateway.ts                # Gateway API and middleware
+│   ├── contextTransfer.ts        # Context transfer functionality
+│   └── index.ts                  # Main SDK class and exports
+├── example/
+│   ├── run-agent.ts              # Basic example
+│   ├── advanced-usage.ts         # Advanced example
+│   ├── comprehensive-demo.ts     # Complete feature demo
+│   └── context-transfer-cli.ts   # CLI implementation
+├── test/
+│   ├── sdk-smoke.test.ts         # Basic SDK tests
+│   ├── module-tests.test.ts      # Module functionality tests
+│   └── cli.test.ts               # CLI tests
+├── scripts/
+│   ├── fix-example-imports.js    # Fix example import paths
+│   ├── fix-all-imports.js        # Fix all import paths
+│   └── sync-features.js          # Sync with Python SDK
+├── package.json
+├── tsconfig.json
+└── README.md
 ```
 
-### Model Support
+## 🔧 Error Handling
 
-Supports all major LLM providers:
-- OpenAI (GPT-3.5, GPT-4)
-- Anthropic (Claude)
-- Google (Gemini)
-- DeepSeek
-- Mistral
-- And many more...
+The SDK includes comprehensive error handling. All methods throw errors with descriptive messages when operations fail:
+
+```typescript
+try {
+  const response = await sdk.generateWithAgent("Hello world");
+} catch (error) {
+  console.error('Generation failed:', error.message);
+}
+```
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+1. **Python not found**: Ensure Python 3.8+ is installed and accessible via `python3`
+2. **MultiMind SDK not installed**: Install the Python SDK with `pip install multimind-sdk`
+3. **Bridge initialization failed**: Check that all required Python modules are available
+4. **Memory issues**: For large models, ensure sufficient RAM and consider using quantization
+5. **GPU issues**: Ensure CUDA is properly installed for GPU acceleration
+
+### Debug Mode
+
+Enable debug logging by setting the environment variable:
+
+```bash
+DEBUG=multimind-sdk npm run dev
+```
 
 ## 📊 Testing
 
@@ -290,29 +475,29 @@ npm test -- test/sdk-smoke.test.ts
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+Apache License 2.0 - see [LICENSE](LICENSE) file for details.
 
 ## 🔄 Feature Parity
 
-This JavaScript/TypeScript SDK maintains full feature parity with the Python MultiMind SDK. Use the sync script to check for any missing features:
+This JavaScript/TypeScript SDK maintains full feature parity with the [Python MultiMind SDK](https://github.com/multimindlab/multimind-sdk). Use the sync script to check for any missing features:
 
 ```bash
 npm run sync-features
 ```
 
-## 📞 Support
+## 🆘 Support
 
-- **Documentation**: [GitHub Wiki](https://github.com/your-org/multimind-sdk-js/wiki)
-- **Issues**: [GitHub Issues](https://github.com/your-org/multimind-sdk-js/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-org/multimind-sdk-js/discussions)
+For issues and questions:
+- Create an issue on GitHub
+- Check the troubleshooting section
+- Ensure you have the latest version installed
+- Review the comprehensive examples
 
-## 🚀 Roadmap
+## 🔗 Related Links
 
-- [ ] WebAssembly support for edge computing
-- [ ] React/Vue.js components
-- [ ] Deno runtime support
-- [ ] Cloud deployment templates
-- [ ] Advanced monitoring and analytics
+- [MultiMind Python SDK](https://github.com/multimindlab/multimind-sdk)
+- [MultiMind Documentation](https://multimind.dev)
+- [MultiMind Discord Community](https://discord.gg/multimind)
 
 ---
 
