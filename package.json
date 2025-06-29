@@ -4,20 +4,51 @@
   "description": "JavaScript/TypeScript SDK bridging to Python MultiMind SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "multimind-cli": "dist/example/context-transfer-cli.js"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node example/run-agent.ts",
-    "clean": "rm -rf dist",
-    "prebuild": "npm run clean"
+    "build:examples": "tsc && node scripts/fix-example-imports.js && node scripts/fix-all-imports.js",
+    "fix-examples": "node scripts/fix-example-imports.js",
+    "fix-imports": "node scripts/fix-all-imports.js",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write src/**/*.ts",
+    "sync-features": "node scripts/sync-features.js",
+    "check-parity": "npm run sync-features",
+    "update-bridge": "node scripts/update-bridge.js",
+    "validate-exports": "node scripts/validate-exports.js",
+    "prepublishOnly": "npm run build:examples && npm test",
+    "cli": "node dist/example/context-transfer-cli.js",
+    "demo": "node dist/example/comprehensive-demo.js",
+    "example:agent": "node dist/example/run-agent.js",
+    "example:advanced": "node dist/example/advanced-usage.js",
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "python-bridge": "^1.1.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.30.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.0.0",
+    "eslint": "^9.30.0",
+    "jest": "^30.0.3",
+    "prettier": "^3.6.2",
+    "ts-jest": "^29.4.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.0",
-    "ts-node": "^10.9.1",
-    "@types/node": "^20.0.0"
+    "typescript-eslint": "^8.35.0"
   },
   "keywords": [
     "multimind",
@@ -28,5 +59,6 @@
     "python-bridge"
   ],
   "author": "MultiMind Team",
-  "license": "MIT"
-} 
+  "license": "MIT",
+  "type": "module"
+}

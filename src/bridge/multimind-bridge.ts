@@ -1,4 +1,5 @@
-import { pythonBridge } from 'python-bridge';
+import pkg from 'python-bridge';
+const { pythonBridge } = pkg;
 
 export const py = pythonBridge({ python: 'python3' });
 

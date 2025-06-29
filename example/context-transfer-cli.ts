@@ -7,7 +7,7 @@
  * between different LLM providers, mirroring the Python SDK's functionality.
  */
 
-import { MultiMindSDK, ConversationMessage } from '../src';
+import { MultiMindSDK, ConversationMessage } from '../src/index';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -36,7 +36,7 @@ interface CLIOptions {
   help?: boolean;
 }
 
-class ContextTransferCLI {
+export class ContextTransferCLI {
   private sdk: MultiMindSDK;
 
   constructor() {
@@ -493,7 +493,7 @@ FILE FORMATS:
             { role: 'user', content: 'Explain machine learning basics' },
             { role: 'assistant', content: 'Machine learning is a subset of AI that enables computers to learn...' }
           ],
-          options: { summaryType: 'concise' }
+          options: { summaryType: 'concise' as 'concise' }
         },
         {
           sourceModel: 'claude',
@@ -502,7 +502,7 @@ FILE FORMATS:
             { role: 'user', content: 'Help me with data analysis' },
             { role: 'assistant', content: 'Data analysis involves collecting, cleaning, and interpreting data...' }
           ],
-          options: { summaryType: 'detailed', includeCodeContext: true }
+          options: { summaryType: 'detailed' as 'detailed', includeCodeContext: true }
         },
         {
           sourceModel: 'gemini',

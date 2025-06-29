@@ -52,6 +52,7 @@ export interface TransferResult {
       source: ModelCapabilities;
       target: ModelCapabilities;
     };
+    transferIndex?: number;
   };
   error?: string;
   errorType?: string;
@@ -486,7 +487,7 @@ ${content}
     return formattedPrompt;
   }
 
-  private async formatForTargetModel(
+  public async formatForTargetModel(
     targetModel: string, 
     summary: string, 
     sourceModel: string, 
@@ -826,7 +827,10 @@ export class ContextTransferAPI {
           transferConfig.options
         );
 
-        result.metadata = { ...result.metadata, transferIndex: i };
+        // Only add transferIndex if metadata exists
+        if (result.metadata) {
+          result.metadata.transferIndex = i;
+        }
         results.push(result);
 
         if (result.success) {
@@ -839,7 +843,7 @@ export class ContextTransferAPI {
           success: false,
           error: error instanceof Error ? error.message : String(error),
           errorType: error instanceof Error ? error.constructor.name : 'Unknown',
-          metadata: { transferIndex: i }
+          // Do not set metadata for error case
         });
         failed++;
       }

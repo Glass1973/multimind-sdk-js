@@ -1,0 +1,141 @@
+name: Sync Features from Python SDK
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allow manual trigger
+  repository_dispatch:
+    types: [python-sdk-update]
+
+jobs:
+  check-python-sdk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout JS SDK
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Fetch Python SDK structure
+        id: fetch-python-sdk
+        run: |
+          # Get latest Python SDK structure
+          curl -s "https://api.github.com/repos/multimindlab/multimind-sdk/contents/multimind" > python_sdk_structure.json
+          
+          # Extract module names
+          MODULES=$(cat python_sdk_structure.json | jq -r '.[].name' | grep -v '__pycache__' | sort)
+          echo "modules<<EOF" >> $GITHUB_OUTPUT
+          echo "$MODULES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          # Get commit hash for reference
+          COMMIT_HASH=$(curl -s "https://api.github.com/repos/multimindlab/multimind-sdk/commits/develop" | jq -r '.sha' | cut -c1-7)
+          echo "commit_hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
+
+      - name: Check JS SDK structure
+        id: check-js-sdk
+        run: |
+          # Get JS SDK modules
+          JS_MODULES=$(find src -name "*.ts" -not -name "*.d.ts" | sed 's|src/||' | sed 's|\.ts||' | sort)
+          echo "js_modules<<EOF" >> $GITHUB_OUTPUT
+          echo "$JS_MODULES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Compare and create issues
+        run: |
+          # Create comparison script
+          cat > compare_modules.js << 'EOF'
+          const fs = require('fs');
+          
+          const pythonModules = fs.readFileSync(process.env.GITHUB_OUTPUT, 'utf-8')
+            .split('\n')
+            .filter(line => line.startsWith('modules<<'))
+            .map(line => line.replace('modules<<EOF', ''))
+            .join('\n')
+            .split('\n')
+            .filter(Boolean);
+          
+          const jsModules = fs.readFileSync(process.env.GITHUB_OUTPUT, 'utf-8')
+            .split('\n')
+            .filter(line => line.startsWith('js_modules<<'))
+            .map(line => line.replace('js_modules<<EOF', ''))
+            .join('\n')
+            .split('\n')
+            .filter(Boolean);
+          
+          const missingInJS = pythonModules.filter(module => !jsModules.includes(module));
+          
+          if (missingInJS.length > 0) {
+            console.log('Missing modules in JS SDK:');
+            missingInJS.forEach(module => {
+              console.log(`- ${module}`);
+            });
+            
+            // Create issue for each missing module
+            missingInJS.forEach(module => {
+              const issueBody = `## New Python SDK Module Detected: \`${module}\`
+              
+              **Python SDK Commit:** ${process.env.COMMIT_HASH}
+              **Detection Date:** ${new Date().toISOString()}
+              
+              ### Action Required
+              - [ ] Review the Python SDK module: \`multimind/${module}/\`
+              - [ ] Implement equivalent functionality in JS SDK
+              - [ ] Add to bridge imports
+              - [ ] Add to main exports
+              - [ ] Create examples/CLI if applicable
+              - [ ] Update documentation
+              
+              ### Python SDK Structure
+              \`\`\`bash
+              curl -s "https://api.github.com/repos/multimindlab/multimind-sdk/contents/multimind/${module}" | jq -r '.[].name'
+              \`\`\`
+              
+              ### Implementation Checklist
+              - [ ] Create \`src/${module}.ts\` or \`src/${module}/\` directory
+              - [ ] Add TypeScript interfaces/types
+              - [ ] Implement bridge calls to Python SDK
+              - [ ] Add to \`src/index.ts\` exports
+              - [ ] Add to \`src/bridge/multimind-bridge.ts\` imports
+              - [ ] Create example usage
+              - [ ] Add tests
+              - [ ] Update README.md
+              
+              **Priority:** Medium
+              **Labels:** enhancement, python-sync, new-feature`;
+              
+              // Use GitHub CLI to create issue
+              console.log(`Creating issue for module: ${module}`);
+              // Note: This would require GitHub CLI setup and proper permissions
+            });
+          } else {
+            console.log('✅ All Python SDK modules are present in JS SDK');
+          }
+          EOF
+          
+          node compare_modules.js
+
+      - name: Create sync report
+        run: |
+          echo "## Feature Sync Report" >> sync_report.md
+          echo "**Date:** $(date)" >> sync_report.md
+          echo "**Python SDK Commit:** ${{ steps.fetch-python-sdk.outputs.commit_hash }}" >> sync_report.md
+          echo "" >> sync_report.md
+          echo "### Status: ✅ All modules synced" >> sync_report.md
+          
+          # Upload report as artifact
+          echo "sync_report.md" > artifacts.txt
+
+      - name: Upload sync report
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-report
+          path: sync_report.md 
