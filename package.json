@@ -1,6 +1,6 @@
 {
   "name": "multimind-sdk",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "This SDK gives JavaScript/TypeScript developers full access to advanced AI features like agent orchestration, RAG, and fine-tuning — without needing to manage backend code.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
