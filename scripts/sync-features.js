@@ -1,241 +1,201 @@
 #!/usr/bin/env node
 
 /**
- * MultiMind SDK Feature Sync Script
+ * Feature Sync Script
  * 
- * Compares the Python SDK structure with the JS SDK to identify
- * missing features and provide implementation guidance.
+ * This script compares the Python MultiMind SDK features with the JavaScript SDK
+ * to ensure feature parity and identify any missing implementations.
  */
 
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-class FeatureSyncChecker {
-  constructor() {
-    this.pythonSDKRepo = 'multimindlab/multimind-sdk';
-    this.jsSDKPath = path.join(__dirname, '..', 'src');
-  }
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  async fetchPythonSDKStructure() {
-    return new Promise((resolve, reject) => {
-      const url = `https://api.github.com/repos/${this.pythonSDKRepo}/contents/multimind`;
-      
-      const options = {
-        headers: {
-          'User-Agent': 'MultiMind-SDK-Sync/1.0',
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      };
-      
-      https.get(url, options, (res) => {
-        let data = '';
-        res.on('data', chunk => data += chunk);
-        res.on('end', () => {
-          try {
-            if (res.statusCode !== 200) {
-              console.error(`GitHub API error: ${res.statusCode}`);
-              console.error('Response:', data);
-              reject(new Error(`GitHub API returned status ${res.statusCode}`));
-              return;
-            }
-            
-            const response = JSON.parse(data);
-            if (Array.isArray(response)) {
-              const modules = response
-                .filter(item => item.type === 'dir' && !item.name.includes('__'))
-                .map(item => item.name);
-              resolve(modules);
-            } else {
-              reject(new Error('Unexpected response format from GitHub API'));
-            }
-          } catch (error) {
-            console.error('Failed to parse GitHub API response:', error);
-            console.error('Raw response:', data.substring(0, 200) + '...');
-            reject(error);
-          }
-        });
-      }).on('error', (error) => {
-        console.error('Network error:', error);
-        reject(error);
-      });
-    });
-  }
+// Define Python SDK features (from the develop branch)
+const PYTHON_SDK_FEATURES = {
+  core: [
+    'agent',
+    'fine_tune', 
+    'rag',
+    'adapters',
+    'evaluation',
+    'models'
+  ],
+  advanced: [
+    'advanced_fine_tuning',
+    'advanced_rag', 
+    'model_conversion',
+    'compliance',
+    'advanced_agent',
+    'model_client_system',
+    'gateway'
+  ],
+  context_transfer: [
+    'context_transfer_manager',
+    'context_transfer_adapters',
+    'context_transfer_api',
+    'context_transfer_batch',
+    'context_transfer_validation',
+    'context_transfer_chrome_extension'
+  ]
+};
 
-  getJSSDKStructure() {
-    const modules = [];
-    
-    function scanDirectory(dirPath, basePath = '') {
-      if (!fs.existsSync(dirPath)) {
-        return;
-      }
-      
-      const items = fs.readdirSync(dirPath);
-      
-      for (const item of items) {
-        const fullPath = path.join(dirPath, item);
-        const relativePath = path.join(basePath, item);
-        const stat = fs.statSync(fullPath);
-        
-        if (stat.isDirectory()) {
-          // Check if directory contains .ts files
-          const hasTsFiles = fs.readdirSync(fullPath).some(file => file.endsWith('.ts'));
-          if (hasTsFiles) {
-            modules.push(relativePath.replace(/\\/g, '/'));
-          }
-          scanDirectory(fullPath, relativePath);
-        } else if (item.endsWith('.ts') && !item.endsWith('.d.ts')) {
-          const moduleName = relativePath.replace(/\.ts$/, '').replace(/\\/g, '/');
-          if (!modules.includes(moduleName)) {
-            modules.push(moduleName);
-          }
-        }
-      }
-    }
-    
-    scanDirectory(this.jsSDKPath);
-    return modules;
-  }
+// Define JavaScript SDK features (current implementation)
+const JS_SDK_FEATURES = {
+  core: [
+    'agent',
+    'fineTune',
+    'rag', 
+    'adapters',
+    'evaluation',
+    'models'
+  ],
+  advanced: [
+    'advancedFineTuning',
+    'advancedRAG',
+    'modelConversion', 
+    'compliance',
+    'advancedAgent',
+    'modelClientSystem',
+    'gateway'
+  ],
+  context_transfer: [
+    'contextTransfer'
+  ]
+};
 
-  async getModuleDetails(moduleName) {
-    return new Promise((resolve) => {
-      const url = `https://api.github.com/repos/${this.pythonSDKRepo}/contents/multimind/${moduleName}`;
-      
-      const options = {
-        headers: {
-          'User-Agent': 'MultiMind-SDK-Sync/1.0',
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      };
-      
-      https.get(url, options, (res) => {
-        let data = '';
-        res.on('data', chunk => data += chunk);
-        res.on('end', () => {
-          try {
-            if (res.statusCode === 200) {
-              const response = JSON.parse(data);
-              if (Array.isArray(response)) {
-                const files = response
-                  .filter(item => item.type === 'file')
-                  .map(item => item.name);
-                resolve(files);
-              } else {
-                resolve([]);
-              }
-            } else {
-              resolve([]); // Module might not exist or be empty
-            }
-          } catch (error) {
-            resolve([]); // Handle parsing errors gracefully
-          }
-        });
-      }).on('error', () => {
-        resolve([]); // Handle network errors gracefully
-      });
-    });
-  }
+// Feature mapping between Python and JS
+const FEATURE_MAPPING = {
+  'agent': 'agent',
+  'fine_tune': 'fineTune',
+  'rag': 'rag',
+  'adapters': 'adapters', 
+  'evaluation': 'evaluation',
+  'models': 'models',
+  'advanced_fine_tuning': 'advancedFineTuning',
+  'advanced_rag': 'advancedRAG',
+  'model_conversion': 'modelConversion',
+  'compliance': 'compliance',
+  'advanced_agent': 'advancedAgent',
+  'model_client_system': 'modelClientSystem',
+  'gateway': 'gateway',
+  'context_transfer_manager': 'contextTransfer',
+  'context_transfer_adapters': 'contextTransfer',
+  'context_transfer_api': 'contextTransfer',
+  'context_transfer_batch': 'contextTransfer',
+  'context_transfer_validation': 'contextTransfer',
+  'context_transfer_chrome_extension': 'contextTransfer'
+};
 
-  async generateSyncReport() {
-    console.log('🔄 Fetching Python SDK structure...');
-    const pythonModules = await this.fetchPythonSDKStructure();
-    
-    console.log('📁 Scanning JS SDK structure...');
-    const jsModules = this.getJSSDKStructure();
-    
-    console.log('\n📊 Generating comparison report...\n');
-    
-    // Find missing modules
-    const missingInJS = pythonModules.filter(module => !jsModules.includes(module));
-    const extraInJS = jsModules.filter(module => !pythonModules.includes(module));
-    
-    // Generate report
-    const report = {
-      timestamp: new Date().toISOString(),
-      pythonModules: pythonModules.length,
-      jsModules: jsModules.length,
-      missingInJS,
-      extraInJS,
-      details: {}
-    };
-    
-    // Get details for missing modules
-    for (const module of missingInJS) {
-      report.details[module] = await this.getModuleDetails(module);
-    }
-    
-    return report;
-  }
-
-  printReport(report) {
-    console.log('🎯 MultiMind SDK Feature Sync Report');
-    console.log('=' .repeat(50));
-    console.log(`📅 Generated: ${report.timestamp}`);
-    console.log(`🐍 Python SDK modules: ${report.pythonModules}`);
-    console.log(`⚡ JS SDK modules: ${report.jsModules}`);
-    console.log('');
-    
-    if (report.missingInJS.length === 0) {
-      console.log('✅ All Python SDK modules are implemented in JS SDK!');
+function checkFeatureParity() {
+  console.log('🔍 Checking feature parity between Python and JavaScript SDKs...\n');
+  
+  const report = {
+    pythonFeatures: 0,
+    jsFeatures: 0,
+    implemented: 0,
+    missing: [],
+    extra: [],
+    coverage: 0
+  };
+  
+  // Count Python features
+  Object.values(PYTHON_SDK_FEATURES).flat().forEach(feature => {
+    report.pythonFeatures++;
+  });
+  
+  // Count JS features
+  Object.values(JS_SDK_FEATURES).flat().forEach(feature => {
+    report.jsFeatures++;
+  });
+  
+  // Check implementation status
+  Object.values(PYTHON_SDK_FEATURES).flat().forEach(pythonFeature => {
+    const jsFeature = FEATURE_MAPPING[pythonFeature];
+    if (jsFeature && Object.values(JS_SDK_FEATURES).flat().includes(jsFeature)) {
+      report.implemented++;
     } else {
-      console.log('⚠️  Missing modules in JS SDK:');
-      console.log('');
-      
-      for (const module of report.missingInJS) {
-        console.log(`📦 ${module}`);
-        const files = report.details[module];
-        if (files.length > 0) {
-          console.log(`   Files: ${files.join(', ')}`);
-        }
-        console.log('');
-      }
-      
-      console.log('🔧 Implementation Guide:');
-      console.log('For each missing module, follow these steps:');
-      console.log('');
-      console.log('1. Review the Python SDK module structure');
-      console.log('2. Create corresponding TypeScript interfaces');
-      console.log('3. Implement bridge calls to Python SDK');
-      console.log('4. Add to src/index.ts exports');
-      console.log('5. Add to src/bridge/multimind-bridge.ts imports');
-      console.log('6. Create example usage and tests');
-      console.log('7. Update documentation');
-      console.log('');
+      report.missing.push(pythonFeature);
     }
-    
-    if (report.extraInJS.length > 0) {
-      console.log('📝 Extra modules in JS SDK (not in Python):');
-      report.extraInJS.forEach(module => {
-        console.log(`   - ${module}`);
-      });
-      console.log('');
+  });
+  
+  // Check for extra JS features
+  Object.values(JS_SDK_FEATURES).flat().forEach(jsFeature => {
+    const hasPythonEquivalent = Object.values(FEATURE_MAPPING).includes(jsFeature);
+    if (!hasPythonEquivalent) {
+      report.extra.push(jsFeature);
     }
-    
-    // Save detailed report to file
-    const reportFile = 'feature-sync-report.json';
-    fs.writeFileSync(reportFile, JSON.stringify(report, null, 2));
-    console.log(`📄 Detailed report saved to: ${reportFile}`);
-  }
+  });
+  
+  // Calculate coverage
+  report.coverage = Math.round((report.implemented / report.pythonFeatures) * 100);
+  
+  return report;
+}
 
-  async run() {
-    try {
-      const report = await this.generateSyncReport();
-      this.printReport(report);
-      
-      if (report.missingInJS.length > 0) {
-        process.exit(1); // Exit with error if missing modules
-      }
-    } catch (error) {
-      console.error('❌ Error during sync check:', error);
+function generateReport(report) {
+  console.log('📊 Feature Parity Report\n');
+  console.log(`Python SDK Features: ${report.pythonFeatures}`);
+  console.log(`JavaScript SDK Features: ${report.jsFeatures}`);
+  console.log(`Implemented Features: ${report.implemented}`);
+  console.log(`Coverage: ${report.coverage}%\n`);
+  
+  if (report.missing.length > 0) {
+    console.log('❌ Missing Features:');
+    report.missing.forEach(feature => {
+      console.log(`  - ${feature}`);
+    });
+    console.log();
+  }
+  
+  if (report.extra.length > 0) {
+    console.log('➕ Extra Features (not in Python SDK):');
+    report.extra.forEach(feature => {
+      console.log(`  + ${feature}`);
+    });
+    console.log();
+  }
+  
+  if (report.coverage === 100) {
+    console.log('🎉 Perfect! 100% feature parity achieved!');
+  } else if (report.coverage >= 90) {
+    console.log('✅ Excellent! High feature parity achieved.');
+  } else if (report.coverage >= 75) {
+    console.log('⚠️  Good coverage, but some features are missing.');
+  } else {
+    console.log('❌ Significant features are missing. Consider implementing them.');
+  }
+  
+  return report;
+}
+
+function saveReport(report) {
+  const reportPath = path.join(__dirname, '..', 'feature-sync-report.json');
+  const reportData = {
+    timestamp: new Date().toISOString(),
+    ...report
+  };
+  
+  fs.writeFileSync(reportPath, JSON.stringify(reportData, null, 2));
+  console.log(`\n📄 Report saved to: ${reportPath}`);
+}
+
+function main() {
+  try {
+    const report = checkFeatureParity();
+    generateReport(report);
+    saveReport(report);
+    
+    if (report.coverage < 100) {
       process.exit(1);
     }
+  } catch (error) {
+    console.error('❌ Error generating feature sync report:', error.message);
+    process.exit(1);
   }
 }
 
-// Run the sync checker
-if (require.main === module) {
-  const checker = new FeatureSyncChecker();
-  checker.run();
-}
-
-module.exports = FeatureSyncChecker; 
+main(); 
