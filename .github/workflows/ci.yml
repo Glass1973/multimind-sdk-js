@@ -29,6 +29,8 @@ jobs:
         run: npm run lint
       - name: Run tests
         run: npm test
+      - name: Build main SDK
+        run: npm run build
       - name: Build project
         run: npm run build:examples
       - name: Run sync features check
@@ -52,6 +54,8 @@ jobs:
         run: npm ci
       - name: Run full test suite
         run: npm test
+      - name: Build main SDK
+        run: npm run build
       - name: Build project
         run: npm run build:examples
       - name: Verify build output
@@ -83,6 +87,8 @@ jobs:
           always-auth: true
       - name: Install dependencies
         run: npm ci
+      - name: Build main SDK
+        run: npm run build
       - name: Build project
         run: npm run build:examples
       - name: Publish to npm
