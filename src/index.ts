@@ -25,6 +25,24 @@ export type { ModelClientConfig, MoEConfig, MultiModalConfig, FederatedConfig } 
 export { MultiMindGateway, RequestMiddleware, ResponseMiddleware } from './gateway';
 export type { GatewayConfig, APIRoute } from './gateway';
 
+// Context Transfer exports
+export {
+  ContextTransferManager,
+  ContextTransferAPI,
+  quickTransfer,
+  getAllModels,
+  validateConversation
+} from './contextTransfer';
+
+export type {
+  ContextTransferConfig,
+  TransferOptions,
+  ModelCapabilities,
+  TransferResult,
+  ConversationMessage,
+  ValidationResult
+} from './contextTransfer';
+
 // Main SDK class for easier usage
 import { initBridge, closeBridge, py } from './bridge/multimind-bridge';
 import { generateWithAgent, createAgent, AgentConfig as BasicAgentConfig } from './agent';
@@ -49,6 +67,23 @@ import { LSTMModelClient, MoEModelClient, MultiModalClient, FederatedRouter } fr
 import type { ModelClientConfig, MoEConfig, MultiModalConfig, FederatedConfig } from './modelClientSystem';
 import { MultiMindGateway } from './gateway';
 import type { GatewayConfig, APIRoute } from './gateway';
+
+// Context Transfer imports
+import {
+  ContextTransferManager,
+  ContextTransferAPI,
+  quickTransfer,
+  getAllModels,
+  validateConversation
+} from './contextTransfer';
+import type {
+  ContextTransferConfig,
+  TransferOptions,
+  ModelCapabilities,
+  TransferResult,
+  ConversationMessage,
+  ValidationResult
+} from './contextTransfer';
 
 export class MultiMindSDK {
   private initialized = false;
@@ -302,6 +337,61 @@ export class MultiMindSDK {
       return this.gateway.stop();
     }
     return { success: true, message: 'No gateway running' };
+  }
+
+  // Context Transfer Methods
+  async createContextTransferManager(config?: ContextTransferConfig) {
+    await this.initialize();
+    return new ContextTransferManager(config);
+  }
+
+  async createContextTransferAPI() {
+    await this.initialize();
+    return new ContextTransferAPI();
+  }
+
+  async transferContext(
+    sourceModel: string,
+    targetModel: string,
+    conversationData: ConversationMessage[] | Record<string, any>,
+    options?: TransferOptions
+  ) {
+    const api = await this.createContextTransferAPI();
+    return api.transferContextAPI(sourceModel, targetModel, conversationData, options);
+  }
+
+  async quickTransfer(
+    sourceModel: string,
+    targetModel: string,
+    conversationData: ConversationMessage[] | Record<string, any>,
+    options?: Record<string, any>
+  ) {
+    return quickTransfer(sourceModel, targetModel, conversationData, options);
+  }
+
+  async getSupportedModels() {
+    const api = await this.createContextTransferAPI();
+    return api.getSupportedModels();
+  }
+
+  async validateConversationFormat(data: ConversationMessage[] | Record<string, any>) {
+    const api = await this.createContextTransferAPI();
+    return api.validateConversationFormat(data);
+  }
+
+  async batchTransfer(transfers: Array<{
+    sourceModel: string;
+    targetModel: string;
+    conversationData: ConversationMessage[] | Record<string, any>;
+    options?: TransferOptions;
+  }>) {
+    const api = await this.createContextTransferAPI();
+    return api.batchTransfer(transfers);
+  }
+
+  async createChromeExtensionConfig() {
+    const api = await this.createContextTransferAPI();
+    return api.createChromeExtensionConfig();
   }
 
   // ===== UTILITY METHODS =====

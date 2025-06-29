@@ -42,17 +42,34 @@ export async function initBridge() {
       from multimind.model_conversion.optimizers.graph import GraphOptimizer
     `;
 
+    // Context transfer imports
+    await py.ex`
+      from multimind.context_transfer import ContextTransferManager, ContextTransferAPI
+      from multimind.context_transfer.adapters import AdapterFactory, ModelAdapter
+      from multimind.context_transfer.adapters import DeepSeekAdapter, ClaudeAdapter, ChatGPTAdapter
+      from multimind.context_transfer.adapters import GeminiAdapter, MistralAdapter, LlamaAdapter
+      from multimind.context_transfer.adapters import CohereAdapter, AnthropicClaudeAdapter, OpenAIGPT4Adapter
+    `;
+
     // Compliance imports
     await py.ex`
-      from multimind.compliance.monitors import ComplianceMonitor
-      from multimind.compliance.validators import ComplianceValidator
+      from multimind.compliance.monitors import GDPRMonitor, HIPAAMonitor, ComplianceMonitor
+      from multimind.compliance.validators import DataValidator, PrivacyValidator
       from multimind.compliance.reporting import ComplianceReporter
     `;
 
-    // Gateway imports
+    // Advanced RAG imports
     await py.ex`
-      from multimind.gateway.api import GatewayAPI
-      from multimind.gateway.middleware import RequestMiddleware, ResponseMiddleware
+      from multimind.rag.advanced import AdvancedRAGEngine
+      from multimind.rag.document_manager import DocumentManager
+      from multimind.rag.hybrid_retrieval import HybridRetrieval
+    `;
+
+    // Advanced agent imports
+    await py.ex`
+      from multimind.agents.advanced import AdvancedAgent
+      from multimind.agents.tools import ToolRegistry, built_in_tools
+      from multimind.agents.memory import MemoryManager
     `;
 
     console.log('MultiMind SDK bridge initialized successfully with all advanced features');
