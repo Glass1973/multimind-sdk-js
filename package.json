@@ -1,5 +1,5 @@
 {
-  "name": "multimind-sdk",
+  "name": "@multimindlab/multimind-sdk",
   "version": "0.1.2",
   "description": "This SDK gives JavaScript/TypeScript developers full access to advanced AI features like agent orchestration, RAG, and fine-tuning — without needing to manage backend code.",
   "main": "dist/index.js",
@@ -69,5 +69,16 @@
   ],
   "author": "MultiMindLab Team",
   "license": "Apache 2.0",
-  "type": "module"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/multimindlab/multimind-sdk-js"
+  },
+  "bugs": {
+    "url": "https://github.com/multimindlab/multimind-sdk-js/issues"
+  },
+  "homepage": "https://github.com/multimindlab/multimind-sdk-js#readme",
+  "type": "module",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
 }
