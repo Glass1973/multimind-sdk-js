@@ -5,6 +5,17 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
+<p align="left">
+  <a href="https://www.npmjs.com/package/multimind-sdk">
+    <img src="https://img.shields.io/npm/v/multimind-sdk?color=blue&label=version&style=for-the-badge" alt="NPM Version">
+  </a>
+  <a href="https://www.npmjs.com/package/multimind-sdk">
+    <img src="https://img.shields.io/npm/dt/multimind-sdk?label=total%20downloads&style=for-the-badge" alt="NPM Total Downloads">
+  </a>
+
+</p>
+
+
 This SDK gives JavaScript/TypeScript developers full access to advanced AI features like agent orchestration, RAG, and fine-tuning — without needing to manage backend code.
 
 ## 🚀 What This SDK Does
