@@ -9,11 +9,12 @@
   <a href="https://www.npmjs.com/package/multimind-sdk">
     <img src="https://img.shields.io/npm/v/multimind-sdk?color=blue&label=version&style=for-the-badge" alt="NPM Version">
   </a>
-  <a href="https://www.npmjs.com/package/multimind-sdk">
-    <img src="https://img.shields.io/npm/dt/multimind-sdk?label=total%20downloads&style=for-the-badge" alt="NPM Total Downloads">
+   <a href="https://www.npmjs.com/package/multimind-sdk">
+    <img src="https://img.shields.io/npm/dw/multimind-sdk?label=downloads/week&style=for-the-badge" />
   </a>
 
 </p>
+
 
 
 This SDK gives JavaScript/TypeScript developers full access to advanced AI features like agent orchestration, RAG, and fine-tuning — without needing to manage backend code.
