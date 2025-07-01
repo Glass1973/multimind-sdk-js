@@ -17,11 +17,11 @@
 
 
 
-This SDK gives JavaScript/TypeScript developers full access to advanced AI features like agent orchestration, RAG, and fine-tuning — without needing to manage backend code.
+This SDK gives JavaScript developers full access to advanced AI features like agent orchestration, RAG, and fine-tuning — without needing to manage backend code.
 
 ## 🚀 What This SDK Does
 
-The MultiMind SDK provides a comprehensive JavaScript/TypeScript interface for advanced AI capabilities:
+The MultiMind SDK provides a comprehensive JavaScript interface for advanced AI capabilities:
 
 - **🤖 AI Agent Orchestration**: Create intelligent agents that can reason, plan, and execute complex tasks
 - **🔍 RAG (Retrieval-Augmented Generation)**: Build knowledge systems that combine your data with AI reasoning
