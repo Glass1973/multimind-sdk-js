@@ -66,8 +66,8 @@ jobs:
           ls -l dist/example/
       - name: Verify build output
         run: |
-          if [ ! -f dist/index.js ]; then echo "dist/index.js not found!" && exit 1; fi
-          node -e "import('./dist/index.js').then(() => console.log('✅ Main SDK imports successfully'))"
+          if [ ! -f dist/src/index.js ]; then echo "dist/src/index.js not found!" && exit 1; fi
+          node -e "import('./dist/src/index.js').then(() => console.log('✅ Main SDK imports successfully'))"
       - name: Test example scripts
         run: |
           echo "Testing compiled examples..."
